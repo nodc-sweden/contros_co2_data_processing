@@ -3,13 +3,15 @@ import numpy as np
 from datetime import datetime
 
 
-from file_reader import list_files, read_files, combine_data_in_subfolders, merge_zero_cycle_with_measurements
+from file_reader import (list_files, read_files, combine_data_in_subfolders, merge_zero_cycle_with_measurements,
+                         read_ferrybox_files, merge_ferrybox_with_pco2)
 from calibration import check_calibration_data
 from calculations import (calculation_of_s2beam, calculation_of_median_s2beam_z, interpolate_s2beam_z,
                           calculation_of_s_dc, calculation_of_sproc, calculation_of_drift_corrected_k1k2k3,
-                          calculation_of_xco2wet, get_quality_of_processed_xco2wet, calculation_of_pco2)
+                          calculation_of_xco2wet, get_quality_of_processed_xco2wet, calculation_of_pco2,
+                          calculation_of_fco2, calculation_of_pco2_fco2_at_sst)
 from flag_state import get_quality_of_processed_pco2wet, get_state_wash, get_state_standby, get_state_extended_flush
-from file_exporter import export_processed_data
+from file_exporter import export_processed_data, export_pcof_fco2_at_sst
 from plot_data import plot_scatter
 
 
@@ -125,11 +127,49 @@ else:
     export_path = r'C:\git\contros_co2_data_processing\export_processed_data'
     export_processed_data(processed_data, export_path)
 
-    # plot data
-    plot_boolean = ((processed_data['State_Zero'] == 0) & (processed_data['State_Flush'] == 0) &
-                    (processed_data['State_Wash'] == 0) & (processed_data['State_Standby'] == 0) &
-                    (processed_data['State_Extended_Flush'] == 0) & (processed_data['Quality_pco2wet'] == 0))
-    plot_scatter(processed_data[plot_boolean], 'time_series', 'pco2wet')
+    # prepare acceptable data to calculate pco2 and fco2 in situ
+    operate_boolean = ((processed_data['State_Zero'] == 0) & (processed_data['State_Flush'] == 0) &
+                       (processed_data['State_Wash'] == 0) & (processed_data['State_Standby'] == 0) &
+                       (processed_data['State_Extended_Flush'] == 0) & (processed_data['Quality_pco2wet'] == 0))
+    cols = ['time_series', 'P_In', 'xco2wet', 'pco2wet']
+    pco2_data = processed_data[operate_boolean][cols]
+    pco2_data = pco2_data.reset_index(drop=True)
+
+    # get additional ferrybox measurements: either quality controlled from the archive of Obs_oceanografi or from
+    # Exprapp (no qc)
+
+    ferrybox_folder = r'C:\git\contros_co2_data_processing\example_data\ferrybox_all_sensors_no_qc'
+    # ferrybox_folder = r'C:\git\contros_co2_data_processing\example_data\obs_oceanografi_ferrybox_qc'
+    file_list = list_files(ferrybox_folder)
+
+    # have the ferrybox data undergone Quality Control? Y or N
+    qc = 'N'
+    # qc = 'Y'
+    ferrybox_data = read_ferrybox_files(file_list, qc)
+
+    # merge ferrybox data with acceptable pCO2 data.
+    pco2_data = merge_ferrybox_with_pco2(pco2_data, ferrybox_data)
+
+    # calculate fco2
+    # the water temperature at the waterside of the membrane is currently not measured. here we use the temperature
+    # measured at the thermosalinograph as an approximation of the temperature at the CONTROS HydroC CO2 instrumnet.
+    # this will result in an error, the size of this error is not properly assessed.
+    pco2_data['fco2wet'] = calculation_of_fco2(pco2_data['SBE45_Temp'], pco2_data['P_In'], p0, pco2_data['pco2wet'],
+                                               pco2_data['xco2wet'])
+
+    # calculate pco2 and fco2 at in situ
+    pco2_data = calculation_of_pco2_fco2_at_sst(pco2_data)
+
+    # save calculated pco2 and fco2 data with additional ferrybox parameters
+    export_pcof_fco2_at_sst(pco2_data, export_path)
+
+    # plot fco2wet_sst
+    plot_scatter(pco2_data, 'time_series', 'fco2wet_sst')
+
+
+
+
+
 
 
 
