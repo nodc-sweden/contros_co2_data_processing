@@ -7,8 +7,9 @@ from file_reader import list_files, read_files, combine_data_in_subfolders, merg
 from calibration import check_calibration_data
 from calculations import (calculation_of_s2beam, calculation_of_median_s2beam_z, interpolate_s2beam_z,
                           calculation_of_s_dc, calculation_of_sproc, calculation_of_drift_corrected_k1k2k3,
-                          calculation_of_xco2wet, get_quality_of_processed_xco2wet, calculation_of_pco2)
-from flag_state import get_quality_of_processed_pco2wet, get_state_wash, get_state_standby, get_state_extended_flush
+                          calculation_of_xco2wet, calculation_of_pco2)
+from flag_state import (get_quality_of_processed_xco2wet, get_quality_of_processed_pco2wet, get_state_wash,
+                        get_state_standby, get_state_extended_flush)
 from file_exporter import export_processed_data
 from plot_data import plot_scatter
 

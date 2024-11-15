@@ -177,30 +177,6 @@ def calculation_of_xco2wet(k1,  k2, k3, sproc, p0, t0, tgas, pndir):
     return xco2wet
 
 
-def get_quality_of_processed_xco2wet(processed_data: pd.DataFrame()):
-    """
-    xco2wet is calculated from the following measurements:
-    "Signal_Raw"
-    "Signal_Ref"
-    "T_Gas"
-    "P_NDIR"
-    """
-    quality_of_parameters_used_in_calculations = ["Quality_Signal_Raw", "Quality_Signal_Ref", "Quality_T_Gas",
-                                                  "Quality_P_NDIR"]
-    same_value = (processed_data['Quality_Signal_Raw'] ==
-                  processed_data['Quality_Signal_Ref']) & (
-                         processed_data['Quality_Signal_Raw'] ==
-                         processed_data['Quality_T_Gas']) & (
-                         processed_data['Quality_Signal_Raw'] ==
-                         processed_data['Quality_P_NDIR'])
-
-    processed_data['Quality_xco2wet'] = processed_data[
-        'Quality_Signal_Raw'].where(same_value, processed_data[quality_of_parameters_used_in_calculations].astype(
-                                                                                       str).agg('_'.join, axis=1))
-
-    return processed_data
-
-
 def calculation_of_pco2(xco2wet, p_in, p0):
     """
 
@@ -211,7 +187,6 @@ def calculation_of_pco2(xco2wet, p_in, p0):
     """
     pco2wet = xco2wet * p_in / p0
     return pco2wet
-
 
 
 
