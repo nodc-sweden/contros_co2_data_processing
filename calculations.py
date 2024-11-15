@@ -177,7 +177,7 @@ def calculation_of_xco2wet(k1,  k2, k3, sproc, p0, t0, tgas, pndir):
     return xco2wet
 
 
-def calculation_of_pco2(xco2wet, p_in, p0):
+def calculation_of_pco2wet(xco2wet, p_in, p0):
     """
 
     :param xco2wet:
