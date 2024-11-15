@@ -9,7 +9,7 @@ from calibration import check_calibration_data
 from calculations import (calculation_of_s2beam, calculation_of_median_s2beam_z, interpolate_s2beam_z,
                           calculation_of_s_dc, calculation_of_sproc, calculation_of_drift_corrected_k1k2k3,
                           calculation_of_xco2wet, calculation_of_pco2wet,
-                          calculation_of_fco2, calculation_of_pco2_fco2_at_sst)
+                          calculation_of_fco2wet, calculation_of_pco2_fco2_at_sst)
 from flag_state import (get_quality_of_processed_xco2wet, get_quality_of_processed_pco2wet, get_state_wash,
                         get_state_standby, get_state_extended_flush)
 from file_exporter import export_processed_data, export_pcof_fco2_at_sst
@@ -155,7 +155,7 @@ else:
     # the water temperature at the waterside of the membrane is currently not measured. here we use the temperature
     # measured at the thermosalinograph as an approximation of the temperature at the CONTROS HydroC CO2 instrumnet.
     # this will result in an error, the size of this error is not properly assessed.
-    pco2_data['fco2wet'] = calculation_of_fco2(pco2_data['SBE45_Temp'], pco2_data['P_In'], p0, pco2_data['pco2wet'],
+    pco2_data['fco2wet'] = calculation_of_fco2wet(pco2_data['SBE45_Temp'], pco2_data['P_In'], p0, pco2_data['pco2wet'],
                                                pco2_data['xco2wet'])
 
     # calculate pco2 and fco2 at in situ

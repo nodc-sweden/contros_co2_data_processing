@@ -189,8 +189,7 @@ def calculation_of_pco2wet(xco2wet, p_in, p0):
     return pco2wet
 
 
-
-def calculation_of_fco2(t_c, p_in, p0, pco2wet, xco2wet):
+def calculation_of_fco2wet(t_c, p_in, p0, pco2wet, xco2wet):
     """
     :param t_c: temperature in degrees Celsius at waterside of membrane
     :param p_in: air pressure at gaseous side of membrane
