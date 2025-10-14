@@ -16,7 +16,7 @@ from file_exporter import export_processed_data, export_pcof_fco2_at_sst
 from plot_data import plot_scatter
 
 
-working_folder = r'C:\git\pCO2_processing\example_data\CO2FT_A'
+working_folder = r'C:\git\contros_co2_data_processing\example_data\CO2FT_A'
 
 # read zero cycle
 zero_cycle_files = list_files(working_folder)
